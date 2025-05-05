@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Singapore Mortgage Term Loan Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="calculator">
+            <div class="calculator-content">
+                <section class="inputs-section">
+                    <h2 class="section-title">Input Details</h2>
+                    
+                    <h3 class="subheading">Property Information</h3>
+                    <div class="input-group">
+                        <label class="input-label" for="propertyValue">Property Valuation</label>
+                        <div class="input-container">
+                            <div class="input-icon">SGD</div>
+                            <input type="number" id="propertyValue" placeholder="E.g 3,000,000" min="0" step="1000">
+                        </div>
+                        <div class="field-error" id="propertyValueError"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label" for="cpfUsed">CPF Used (Including Accrued Interest)</label>
+                        <div class="input-container">
+                            <div class="input-icon">SGD</div>
+                            <input type="number" id="cpfUsed" placeholder="E.g 300,000" min="0" step="1000">
+                        </div>
+                        <div class="field-error" id="cpfUsedError"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label" for="yearsSincePurchase">Years Since Property Purchase</label>
+                        <div class="input-container">
+                            <div class="input-icon">Years</div>
+                            <input type="number" id="yearsSincePurchase" placeholder="E.g 20" min="0" max="50">
+                        </div>
+                        <div class="field-error" id="yearsSincePurchaseError"></div>
+                    </div>
+                    
+                    <h3 class="subheading">Borrower Information</h3>
+                    <div class="input-group">
+                        <label class="input-label" for="averageAge">Average Age of Borrower(s)</label>
+                        <div class="input-container">
+                            <div class="input-icon">Age</div>
+                            <input type="number" id="averageAge" placeholder="E.g 45" min="21" max="65">
+                        </div>
+                        <div class="field-error" id="averageAgeError"></div>
+                        <div class="input-note">* Banks use Income-Weighted-Average-Age instead</div>
+                    </div>
+                    
+                    <h3 class="subheading">Loan Information</h3>
+                    <div class="input-group">
+                        <label class="input-label" for="outstandingHomeLoan">Outstanding Home Loan (If any)</label>
+                        <div class="input-container">
+                            <div class="input-icon">SGD</div>
+                            <input type="number" id="outstandingHomeLoan" placeholder="E.g 1,500,000" min="0" step="1000">
+                        </div>
+                        <div class="field-error" id="outstandingHomeLoanError"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label" for="outstandingTermLoan">Outstanding Term Loan (If any)</label>
+                        <div class="input-container">
+                            <div class="input-icon">SGD</div>
+                            <input type="number" id="outstandingTermLoan" placeholder="E.g 100,000" min="0" step="1000">
+                        </div>
+                        <div class="field-error" id="outstandingTermLoanError"></div>
+                    </div>
+                    
+                    <div class="error-message" id="error"></div>
+                </section>
+
+                <section class="results-section">
+                    <h2 class="section-title">Results</h2>
+                    
+                    <div class="initial-message" id="initialMessage">
+                        <div class="initial-message-icon">
+                            <img src="/api/placeholder/60/60" alt="Calculator Icon">
+                        </div>
+                        <div class="initial-message-content">
+                            <div class="initial-message-title">Singapore Mortgage Term Loan Calculator</div>
+                            <div class="initial-message-description">
+                                Enter your property details and loan information to calculate your eligible term loan amount and monthly installments.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calculationResults" class="hidden">
+                        <div class="result-item positive" id="eligibleLoanResult">
+                            <div class="result-label">Eligible Additional Term Loan Amount:</div>
+                            <div class="result-value positive" id="eligibleLoanValue">SGD 0</div>
+                            <div class="field-error" id="eligibilityMessage"></div>
+                        </div>
+                        
+                        <div id="loanDetails" class="hidden">
+                            <div class="result-pair">
+                                <div class="result-item">
+                                    <div class="result-label">Outstanding Home Loan:</div>
+                                    <div class="result-value" id="outstandingHomeLoanValue">SGD 0</div>
+                                </div>
+                                
+                                <div class="result-item">
+                                    <div class="result-label">Outstanding Term Loan:</div>
+                                    <div class="result-value" id="outstandingTermLoanValue">SGD 0</div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-item">
+                                <div class="result-label">Additional Term Loan:</div>
+                                <div class="input-container">
+                                    <div class="input-icon">SGD</div>
+                                    <input type="number" id="additionalTermLoan" min="0" step="1000">
+                                </div>
+                                <div class="field-error" id="additionalLoanMessage"></div>
+                            </div>
+                            
+                            <div class="result-item">
+                                <div class="result-label">Preferred Home Loan Tenure:</div>
+                                <div class="tenure-display" id="homeLoanTenureDisplay">14 years</div>
+                                <div class="slider-container">
+                                    <input type="range" min="5" max="35" class="slider" id="homeLoanTenure">
+                                    <div class="slider-labels">
+                                        <span>5 years</span>
+                                        <span id="maxHomeLoanTenure">35 years</span>
+                                    </div>
+                                    <div class="tenure-input-container">
+                                        <input type="number" id="homeLoanTenureInput" class="tenure-input" min="5" max="35">
+                                        <span>years</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-item">
+                                <div class="result-label">Preferred Term Loan Tenure:</div>
+                                <div class="tenure-display" id="termLoanTenureDisplay">30 years</div>
+                                <div class="slider-container">
+                                    <input type="range" min="5" max="35" class="slider" id="termLoanTenure">
+                                    <div class="slider-labels">
+                                        <span>5 years</span>
+                                        <span id="maxTermLoanTenure">35 years</span>
+                                    </div>
+                                    <div class="tenure-input-container">
+                                        <input type="number" id="termLoanTenureInput" class="tenure-input" min="5" max="35">
+                                        <span>years</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-pair">
+                                <div class="result-item">
+                                    <div class="result-label">Home Loan Monthly Installment:</div>
+                                    <div class="result-value" id="homeLoanMonthlyValue">SGD 0</div>
+                                    <div class="payment-method">Payment method: Cash/CPF</div>
+                                </div>
+                                
+                                <div class="result-item">
+                                    <div class="result-label">Term Loan Monthly Installment:</div>
+                                    <div class="result-value" id="termLoanMonthlyValue">SGD 0</div>
+                                    <div class="payment-method">Payment method: Cash Only</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
