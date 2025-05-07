@@ -327,26 +327,42 @@ input::placeholder {
   font-size: 16px;
 }
 
-.tenure-input-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  gap: 10px;
+/* Active state for slider */
+.slider:active::-webkit-slider-thumb {
+  transform: scale(1.2);
+  background: var(--secondary-color);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
 }
 
-.tenure-input {
-  width: 80px;
-  padding: 8px;
-  border: 1px solid #e8e8e8;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  text-align: center;
+.slider:active::-moz-range-thumb {
+  transform: scale(1.2);
+  background: var(--secondary-color);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
 }
 
-.tenure-input:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(5, 45, 74, 0.1);
+/* Focus state for better accessibility */
+.slider:focus {
+  outline: none;
+}
+
+.slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.slider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* Slider track styling for Firefox */
+.slider::-moz-range-track {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 5px;
+}
+
+/* Slider progress fill effect */
+.slider {
+  background: linear-gradient(to right, var(--primary-color) 0%, var(--primary-color) 50%, #e0e0e0 50%, #e0e0e0 100%);
 }
 
 .result-item {

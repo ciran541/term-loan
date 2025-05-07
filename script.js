@@ -8,8 +8,7 @@ const outstandingTermLoan = document.getElementById('outstandingTermLoan');
 const additionalTermLoan = document.getElementById('additionalTermLoan');
 const homeLoanTenure = document.getElementById('homeLoanTenure');
 const termLoanTenure = document.getElementById('termLoanTenure');
-const homeLoanTenureInput = document.getElementById('homeLoanTenureInput');
-const termLoanTenureInput = document.getElementById('termLoanTenureInput');
+const calculateButton = document.getElementById('calculateButton');
 
 // Get result elements
 const eligibleLoanValue = document.getElementById('eligibleLoanValue');
@@ -27,22 +26,53 @@ const loanDetails = document.getElementById('loanDetails');
 const eligibleLoanResult = document.getElementById('eligibleLoanResult');
 const initialMessage = document.getElementById('initialMessage');
 const calculationResults = document.getElementById('calculationResults');
+const errorMessage = document.getElementById('error');
 
-// Add event listeners to input fields
+// Add event listeners to input fields for validation only
 const inputFields = [propertyValue, cpfUsed, averageAge, yearsSincePurchase, outstandingHomeLoan, outstandingTermLoan];
 inputFields.forEach(input => {
-    input.addEventListener('input', function(e) {
-        validateInput(e);
-        calculateAll();
-    });
+    input.addEventListener('input', validateInput);
 });
 
-// Add event listeners to sliders and inputs
-homeLoanTenure.addEventListener('input', () => updateHomeLoanTenure(homeLoanTenure.value, true));
-termLoanTenure.addEventListener('input', () => updateTermLoanTenure(termLoanTenure.value, true));
-homeLoanTenureInput.addEventListener('input', () => updateHomeLoanTenure(homeLoanTenureInput.value, false));
-termLoanTenureInput.addEventListener('input', () => updateTermLoanTenure(termLoanTenureInput.value, false));
-additionalTermLoan.addEventListener('input', validateAdditionalLoan);
+// Add event listeners to sliders
+homeLoanTenure.addEventListener('input', () => {
+    updateHomeLoanTenure(homeLoanTenure.value);
+    calculateMonthlyInstallments(); // Update monthly values when slider changes
+});
+
+termLoanTenure.addEventListener('input', () => {
+    updateTermLoanTenure(termLoanTenure.value);
+    calculateMonthlyInstallments(); // Update monthly values when slider changes
+});
+
+// Modified event listener for additionalTermLoan
+additionalTermLoan.addEventListener('input', () => {
+    validateAdditionalLoan();
+    calculateMonthlyInstallments(); // Update monthly values when additional loan changes
+});
+
+// Add event listener to calculate button
+calculateButton.addEventListener('click', calculateAll);
+
+// Add event listeners for years since purchase and age validation
+yearsSincePurchase.addEventListener('input', validateAgePurchase);
+averageAge.addEventListener('input', validateAgePurchase);
+
+// Validate average age vs years since purchase
+function validateAgePurchase() {
+    const age = parseFloat(averageAge.value) || 0;
+    const years = parseFloat(yearsSincePurchase.value) || 0;
+    const errorElement = document.getElementById('yearsSincePurchaseError');
+    
+    if (age - years < 21) {
+        errorElement.textContent = 'Years since purchase exceeds limit. Age at purchase cannot be less than 21.';
+        errorElement.style.display = 'block';
+        return false;
+    } else {
+        errorElement.style.display = 'none';
+        return true;
+    }
+}
 
 // Validate input fields
 function validateInput(e) {
@@ -53,7 +83,12 @@ function validateInput(e) {
     
     if (input.value === '') {
         errorElement.style.display = 'none';
-        return;
+        return false;
+    }
+    
+    // Update max age to 70 for average age
+    if (id === 'averageAge') {
+        input.max = 70;
     }
     
     if (isNaN(value) || value < parseFloat(input.min) || (input.max && value > parseFloat(input.max))) {
@@ -62,6 +97,25 @@ function validateInput(e) {
         return false;
     } else {
         errorElement.style.display = 'none';
+        return true;
+    }
+}
+
+// Validate years since purchase against outstanding loan
+function validateYearsSincePurchase() {
+    const years = parseFloat(yearsSincePurchase.value) || 0;
+    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+    const errorElement = document.getElementById('yearsSincePurchaseError');
+    
+    if (years >= 30 && homeLoan > 0) {
+        errorElement.textContent = 'For properties owned 30+ years, outstanding home loan must be $0.';
+        errorElement.style.display = 'block';
+        return false;
+    } else {
+        // Only clear if there's no age-purchase validation error
+        if (validateAgePurchase()) {
+            errorElement.style.display = 'none';
+        }
         return true;
     }
 }
@@ -131,21 +185,19 @@ function calculateMaxTenures() {
     
     homeLoanTenure.max = maxHomeTenure;
     termLoanTenure.max = maxTermTenure;
-    homeLoanTenureInput.max = maxHomeTenure;
-    termLoanTenureInput.max = maxTermTenure;
     
     maxHomeLoanTenure.textContent = maxHomeTenure + ' years';
     maxTermLoanTenure.textContent = maxTermTenure + ' years';
     
     // Set default tenures
-    updateHomeLoanTenure(maxHomeTenure, true);
-    updateTermLoanTenure(maxTermTenure, true);
+    updateHomeLoanTenure(maxHomeTenure);
+    updateTermLoanTenure(maxTermTenure);
     
     return { homeTenure: maxHomeTenure, termTenure: maxTermTenure };
 }
 
 // Update home loan tenure
-function updateHomeLoanTenure(value, fromSlider = true) {
+function updateHomeLoanTenure(value) {
     let tenure = parseInt(value);
     const maxTenure = parseInt(homeLoanTenure.max);
     const minTenure = parseInt(homeLoanTenure.min);
@@ -157,14 +209,11 @@ function updateHomeLoanTenure(value, fromSlider = true) {
     }
     
     homeLoanTenure.value = tenure;
-    homeLoanTenureInput.value = tenure;
     homeLoanTenureDisplay.textContent = tenure + ' years';
-    
-    calculateMonthlyInstallments();
 }
 
 // Update term loan tenure
-function updateTermLoanTenure(value, fromSlider = true) {
+function updateTermLoanTenure(value) {
     let tenure = parseInt(value);
     const maxTenure = parseInt(termLoanTenure.max);
     const minTenure = parseInt(termLoanTenure.min);
@@ -172,14 +221,11 @@ function updateTermLoanTenure(value, fromSlider = true) {
     if (isNaN(tenure) || tenure < minTenure) {
         tenure = minTenure;
     } else if (tenure > maxTenure) {
-        tenure = maxTermTenure;
+        tenure = maxTenure;
     }
     
     termLoanTenure.value = tenure;
-    termLoanTenureInput.value = tenure;
     termLoanTenureDisplay.textContent = tenure + ' years';
-    
-    calculateMonthlyInstallments();
 }
 
 // Validate additional term loan amount
@@ -199,12 +245,15 @@ function validateAdditionalLoan() {
         additionalLoanMessage.textContent = '';
         additionalLoanMessage.style.display = 'none';
     }
-    
-    calculateMonthlyInstallments();
 }
 
 // Calculate monthly installments
 function calculateMonthlyInstallments() {
+    // Only calculate if results are visible
+    if (calculationResults.classList.contains('hidden')) {
+        return;
+    }
+    
     const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
     const additionalLoan = parseFloat(additionalTermLoan.value) || 0;
     const outstandingTerm = parseFloat(outstandingTermLoan.value) || 0;
@@ -232,6 +281,24 @@ function calculateMonthlyInstallments() {
 
 // Calculate all values
 function calculateAll() {
+    // Validate all inputs before calculating
+    let isValid = true;
+    inputFields.forEach(input => {
+        const valid = validateInput({ target: input });
+        if (!valid) isValid = false;
+    });
+    
+    // Additional validations
+    if (!validateAgePurchase()) isValid = false;
+    if (!validateYearsSincePurchase()) isValid = false;
+    
+    if (!isValid) {
+        errorMessage.textContent = 'Please correct all input errors before calculating.';
+        errorMessage.style.display = 'block';
+        return;
+    }
+    
+    errorMessage.style.display = 'none';
     initialMessage.classList.add('hidden');
     calculationResults.classList.remove('hidden');
     
@@ -242,14 +309,3 @@ function calculateAll() {
     calculateMaxTenures();
     calculateMonthlyInstallments();
 }
-
-// Set initial values for demonstration
-propertyValue.value = "3000000";
-cpfUsed.value = "300000";
-averageAge.value = "45";
-yearsSincePurchase.value = "20";
-outstandingHomeLoan.value = "1500000";
-outstandingTermLoan.value = "100000";
-
-// Initialize calculations
-calculateAll();
