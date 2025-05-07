@@ -34,17 +34,6 @@ inputFields.forEach(input => {
     input.addEventListener('input', validateInput);
 });
 
-// Add event listeners to sliders
-homeLoanTenure.addEventListener('input', () => {
-    updateHomeLoanTenure(homeLoanTenure.value);
-    calculateMonthlyInstallments(); // Update monthly values when slider changes
-});
-
-termLoanTenure.addEventListener('input', () => {
-    updateTermLoanTenure(termLoanTenure.value);
-    calculateMonthlyInstallments(); // Update monthly values when slider changes
-});
-
 // Modified event listener for additionalTermLoan
 additionalTermLoan.addEventListener('input', () => {
     validateAdditionalLoan();
@@ -57,6 +46,13 @@ calculateButton.addEventListener('click', calculateAll);
 // Add event listeners for years since purchase and age validation
 yearsSincePurchase.addEventListener('input', validateAgePurchase);
 averageAge.addEventListener('input', validateAgePurchase);
+
+// Initialize sliders when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Hide original sliders if present
+    if (homeLoanTenure) homeLoanTenure.style.display = 'none';
+    if (termLoanTenure) termLoanTenure.style.display = 'none';
+});
 
 // Validate average age vs years since purchase
 function validateAgePurchase() {
@@ -189,6 +185,28 @@ function calculateMaxTenures() {
     maxHomeLoanTenure.textContent = maxHomeTenure + ' years';
     maxTermLoanTenure.textContent = maxTermTenure + ' years';
     
+    // Update slider ranges if they exist
+    const homeLoanSlider = document.getElementById('homeLoanSlider');
+    const termLoanSlider = document.getElementById('termLoanSlider');
+    
+    if (homeLoanSlider && homeLoanSlider.noUiSlider) {
+        homeLoanSlider.noUiSlider.updateOptions({
+            range: {
+                'min': 5,
+                'max': maxHomeTenure
+            }
+        }, true);
+    }
+    
+    if (termLoanSlider && termLoanSlider.noUiSlider) {
+        termLoanSlider.noUiSlider.updateOptions({
+            range: {
+                'min': 5,
+                'max': maxTermTenure
+            }
+        }, true);
+    }
+    
     // Set default tenures
     updateHomeLoanTenure(maxHomeTenure);
     updateTermLoanTenure(maxTermTenure);
@@ -210,6 +228,12 @@ function updateHomeLoanTenure(value) {
     
     homeLoanTenure.value = tenure;
     homeLoanTenureDisplay.textContent = tenure + ' years';
+    
+    // Update slider if it exists
+    const homeLoanSlider = document.getElementById('homeLoanSlider');
+    if (homeLoanSlider && homeLoanSlider.noUiSlider) {
+        homeLoanSlider.noUiSlider.set(tenure);
+    }
 }
 
 // Update term loan tenure
@@ -226,6 +250,12 @@ function updateTermLoanTenure(value) {
     
     termLoanTenure.value = tenure;
     termLoanTenureDisplay.textContent = tenure + ' years';
+    
+    // Update slider if it exists
+    const termLoanSlider = document.getElementById('termLoanSlider');
+    if (termLoanSlider && termLoanSlider.noUiSlider) {
+        termLoanSlider.noUiSlider.set(tenure);
+    }
 }
 
 // Validate additional term loan amount
@@ -279,6 +309,227 @@ function calculateMonthlyInstallments() {
     }
 }
 
+// Initialize the noUiSlider sliders with improved UI
+function initializeSliders() {
+    // Get slider elements
+    const homeLoanSlider = document.getElementById('homeLoanSlider');
+    const termLoanSlider = document.getElementById('termLoanSlider');
+    const homeLoanTenureDisplay = document.getElementById('homeLoanTenureDisplay');
+    const termLoanTenureDisplay = document.getElementById('termLoanTenureDisplay');
+    
+    // Get hidden range inputs
+    const homeLoanTenure = document.getElementById('homeLoanTenure');
+    const termLoanTenure = document.getElementById('termLoanTenure');
+    
+    // Update max labels with correct values
+    document.getElementById('maxHomeLoanTenure').textContent = homeLoanTenure.max + ' years';
+    document.getElementById('maxTermLoanTenure').textContent = termLoanTenure.max + ' years';
+    
+    // Remove old sliders if they exist
+    if (homeLoanSlider.noUiSlider) {
+        homeLoanSlider.noUiSlider.destroy();
+    }
+    if (termLoanSlider.noUiSlider) {
+        termLoanSlider.noUiSlider.destroy();
+    }
+    
+    // Get initial values and ranges
+    const homeLoanValue = parseInt(homeLoanTenure.value) || 14;
+    const termLoanValue = parseInt(termLoanTenure.value) || 30;
+    const maxHomeTenure = parseInt(homeLoanTenure.max) || 35;
+    const maxTermTenure = parseInt(termLoanTenure.max) || 35;
+    
+    // Initialize Home Loan Slider with improved settings
+    noUiSlider.create(homeLoanSlider, {
+        start: homeLoanValue,
+        connect: [true, false],
+        step: 1,
+        range: {
+            'min': 5,
+            'max': maxHomeTenure
+        },
+        format: {
+            to: function (value) {
+                return parseInt(value);
+            },
+            from: function (value) {
+                return parseInt(value);
+            }
+        },
+        tooltips: false // We'll use our custom bubble instead
+    });
+
+    // Initialize Term Loan Slider with improved settings
+    noUiSlider.create(termLoanSlider, {
+        start: termLoanValue,
+        connect: [true, false],
+        step: 1,
+        range: {
+            'min': 5,
+            'max': maxTermTenure
+        },
+        format: {
+            to: function (value) {
+                return parseInt(value);
+            },
+            from: function (value) {
+                return parseInt(value);
+            }
+        },
+        tooltips: false // We'll use our custom bubble instead
+    });
+
+    // Create bubbles for handles
+    const homeLoanHandle = homeLoanSlider.querySelector('.noUi-handle');
+    const termLoanHandle = termLoanSlider.querySelector('.noUi-handle');
+    
+    const homeLoanBubble = document.createElement('div');
+    homeLoanBubble.className = 'value-bubble';
+    homeLoanHandle.appendChild(homeLoanBubble);
+    
+    const termLoanBubble = document.createElement('div');
+    termLoanBubble.className = 'value-bubble';
+    termLoanHandle.appendChild(termLoanBubble);
+
+    // Add focus elements to make it clear where the slider is positioned
+    const homeLoanFocus = document.createElement('div');
+    homeLoanFocus.className = 'handle-focus';
+    homeLoanHandle.appendChild(homeLoanFocus);
+    
+    const termLoanFocus = document.createElement('div');
+    termLoanFocus.className = 'handle-focus';
+    termLoanHandle.appendChild(termLoanFocus);
+
+    // Update display values and bubbles
+    homeLoanSlider.noUiSlider.on('update', function(values, handle) {
+        const value = values[handle];
+        homeLoanTenureDisplay.textContent = value + ' years';
+        homeLoanBubble.textContent = value + ' yrs';
+        
+        // Update the original range input for compatibility
+        homeLoanTenure.value = value;
+        
+        // Animate the display text on change
+        homeLoanTenureDisplay.classList.add('value-updated');
+        setTimeout(() => {
+            homeLoanTenureDisplay.classList.remove('value-updated');
+        }, 300);
+        
+        // Trigger calculation
+        if (typeof calculateMonthlyInstallments === 'function') {
+            calculateMonthlyInstallments();
+        }
+    });
+
+    termLoanSlider.noUiSlider.on('update', function(values, handle) {
+        const value = values[handle];
+        termLoanTenureDisplay.textContent = value + ' years';
+        termLoanBubble.textContent = value + ' yrs';
+        
+        // Update the original range input for compatibility
+        termLoanTenure.value = value;
+        
+        // Animate the display text on change
+        termLoanTenureDisplay.classList.add('value-updated');
+        setTimeout(() => {
+            termLoanTenureDisplay.classList.remove('value-updated');
+        }, 300);
+        
+        // Trigger calculation
+        if (typeof calculateMonthlyInstallments === 'function') {
+            calculateMonthlyInstallments();
+        }
+    });
+
+    // Enhanced interaction effects
+    [homeLoanHandle, termLoanHandle].forEach(handle => {
+        // Show bubble on active state
+        handle.addEventListener('mousedown', function() {
+            this.classList.add('noUi-active');
+            const bubble = this.querySelector('.value-bubble');
+            if (bubble) bubble.classList.add('bubble-active');
+        });
+        
+        handle.addEventListener('touchstart', function() {
+            this.classList.add('noUi-active');
+            const bubble = this.querySelector('.value-bubble');
+            if (bubble) bubble.classList.add('bubble-active');
+        });
+        
+        // Hide bubble when mouse up anywhere on document
+        document.addEventListener('mouseup', function() {
+            handle.classList.remove('noUi-active');
+            const bubble = handle.querySelector('.value-bubble');
+            if (bubble) bubble.classList.remove('bubble-active');
+        });
+        
+        document.addEventListener('touchend', function() {
+            handle.classList.remove('noUi-active');
+            const bubble = handle.querySelector('.value-bubble');
+            if (bubble) bubble.classList.remove('bubble-active');
+        });
+        
+        // Show bubble on hover
+        handle.addEventListener('mouseover', function() {
+            const bubble = this.querySelector('.value-bubble');
+            if (bubble) bubble.classList.add('bubble-hover');
+        });
+        
+        handle.addEventListener('mouseout', function() {
+            const bubble = this.querySelector('.value-bubble');
+            if (bubble && !this.classList.contains('noUi-active')) {
+                bubble.classList.remove('bubble-hover');
+            }
+        });
+    });
+    
+    // Add visual indication when slider is near the edge
+    function checkSliderPosition(slider, handle) {
+        const range = slider.noUiSlider.options.range;
+        const value = slider.noUiSlider.get();
+        const min = range.min;
+        const max = range.max;
+        
+        // Remove all position classes
+        handle.classList.remove('at-min', 'at-max', 'near-min', 'near-max');
+        
+        // Add appropriate classes based on position
+        if (value <= min) handle.classList.add('at-min');
+        else if (value >= max) handle.classList.add('at-max');
+        else if (value <= min + (max - min) * 0.1) handle.classList.add('near-min');
+        else if (value >= max - (max - min) * 0.1) handle.classList.add('near-max');
+    }
+    
+    // Check initial positions
+    checkSliderPosition(homeLoanSlider, homeLoanHandle);
+    checkSliderPosition(termLoanSlider, termLoanHandle);
+    
+    // Update positions on slider change
+    homeLoanSlider.noUiSlider.on('update', function() {
+        checkSliderPosition(homeLoanSlider, homeLoanHandle);
+    });
+    
+    termLoanSlider.noUiSlider.on('update', function() {
+        checkSliderPosition(termLoanSlider, termLoanHandle);
+    });
+    
+    // Make sure sliders are fully initialized and visible
+    setTimeout(() => {
+        homeLoanSlider.classList.add('slider-initialized');
+        termLoanSlider.classList.add('slider-initialized');
+    }, 100);
+}
+
+// Call the initialization function when the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if noUiSlider is loaded
+    if (typeof noUiSlider !== 'undefined') {
+        initializeSliders();
+    } else {
+        console.error('noUiSlider is not loaded. Please include the library.');
+    }
+});
+
 // Calculate all values
 function calculateAll() {
     // Validate all inputs before calculating
@@ -307,5 +558,9 @@ function calculateAll() {
     
     calculateEligibleLoan();
     calculateMaxTenures();
+    
+    // Initialize sliders after calculating max tenures
+    initializeSliders();
+    
     calculateMonthlyInstallments();
 }

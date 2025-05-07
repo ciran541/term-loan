@@ -265,104 +265,224 @@ input::placeholder {
   border-left: 3px solid var(--error-color);
 }
 
+/* Modern Slider Styles */
+
+/* Hide original sliders */
+.hidden {
+  display: none !important;
+}
+
+/* Result item container */
+.result-item {
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Result label */
+.result-label {
+  font-size: 1rem;
+  color: #334155;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/* Value display */
+.tenure-display {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #052d4a;
+  margin-top: 12px;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Animation for value updates */
+.value-updated {
+  color: #0284c7;
+  transform: scale(1.05);
+}
+
+/* Slider container */
 .slider-container {
-  margin-top: 15px;
-  padding: 0 10px;
+  padding: 12px 0;
+  margin: 12px 0;
 }
 
-.slider {
-  width: 100%;
-  height: 6px;
-  border-radius: 5px;
-  background: #e0e0e0;
-  outline: none;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-}
-
-.slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-
-.slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.slider::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-
+/* Slider labels */
 .slider-labels {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
+  color: #64748b;
+  font-size: 0.875rem;
+  padding: 0 2px;
+}
+
+/* noUiSlider base styling */
+.noUi-target {
+  height: 8px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: none;
+  background-color: #e2e8f0;
+  margin: 12px 0;
+}
+
+/* Connected part of the slider */
+.noUi-connect {
+  background: linear-gradient(to right, #0369a1, #0284c7);
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+/* Handle styling */
+.noUi-horizontal .noUi-handle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: 2px solid #0284c7;
+  top: -8px;
+  right: -11px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Handle hover effects */
+.noUi-horizontal .noUi-handle:hover {
+  transform: scale(1.1);
+  border-color: #0369a1;
+  box-shadow: 0 3px 10px rgba(2, 132, 199, 0.25);
+}
+
+/* Active handle styling */
+.noUi-horizontal .noUi-active {
+  transform: scale(1.15);
+  border-color: #0369a1;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+/* Remove default handle elements */
+.noUi-handle:before, 
+.noUi-handle:after {
+  display: none;
+}
+
+/* Focus ring around handle */
+.handle-focus {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(2, 132, 199, 0.1);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease;
+  z-index: -1;
+}
+
+.noUi-active .handle-focus {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Value bubble */
+.value-bubble {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background-color: #052d4a;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 16px;
   font-size: 12px;
-  color: var(--neutral-color);
-}
-
-.tenure-display {
-  text-align: center;
   font-weight: 600;
-  margin-top: 12px;
-  color: var(--primary-color);
-  font-size: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 5;
 }
 
-/* Active state for slider */
-.slider:active::-webkit-slider-thumb {
-  transform: scale(1.2);
-  background: var(--secondary-color);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+.value-bubble:after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #052d4a transparent transparent transparent;
 }
 
-.slider:active::-moz-range-thumb {
-  transform: scale(1.2);
-  background: var(--secondary-color);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+/* Show bubble on active state or hover */
+.bubble-active,
+.bubble-hover {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
-/* Focus state for better accessibility */
-.slider:focus {
-  outline: none;
+/* Animation for slider initialization */
+.slider-initialized .noUi-base {
+  animation: slider-fade-in 0.5s ease;
 }
 
-.slider:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+@keyframes slider-fade-in {
+  from {
+      opacity: 0.5;
+  }
+  to {
+      opacity: 1;
+  }
 }
 
-.slider:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+/* Edge indicator styles */
+.at-min, .at-max {
+  background-color: #f97316;
+  border-color: #ea580c;
 }
 
-/* Slider track styling for Firefox */
-.slider::-moz-range-track {
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 5px;
+.near-min, .near-max {
+  border-color: #f97316;
 }
 
-/* Slider progress fill effect */
-.slider {
-  background: linear-gradient(to right, var(--primary-color) 0%, var(--primary-color) 50%, #e0e0e0 50%, #e0e0e0 100%);
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .result-item {
+      padding: 1rem;
+  }
+  
+  .tenure-display {
+      font-size: 1.75rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (pointer: coarse) {
+  .noUi-horizontal .noUi-handle {
+      width: 28px;
+      height: 28px;
+      top: -11px;
+      right: -14px;
+      border-width: 3px;
+  }
+  
+  .value-bubble {
+      padding: 4px 12px;
+      font-size: 14px;
+      top: -40px;
+  }
+  
+  .handle-focus {
+      width: 44px;
+      height: 44px;
+  }
 }
 
 .result-item {

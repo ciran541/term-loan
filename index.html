@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Singapore Mortgage Term Loan Calculator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
 </head>
 <body>
     <div class="container">
@@ -124,29 +125,37 @@
                                 <div class="field-error" id="additionalLoanMessage"></div>
                             </div>
                             
-                            <div class="result-item">
-                                <div class="result-label">Preferred Home Loan Tenure:</div>
-                                <div class="tenure-display" id="homeLoanTenureDisplay">14 years</div>
-                                <div class="slider-container">
-                                    <input type="range" min="5" max="35" class="slider" id="homeLoanTenure">
-                                    <div class="slider-labels">
-                                        <span>5 years</span>
-                                        <span id="maxHomeLoanTenure">35 years</span>
-                                    </div>
-                                </div>
-                            </div>
+
+<!-- Updated HTML structure for the sliders section -->
+<div class="loan-settings-container">
+    <div class="result-item">
+        <div class="result-label">Preferred Home Loan Tenure:</div>
+        <div class="tenure-display" id="homeLoanTenureDisplay">28 years</div>
+        <div class="slider-container">
+            <div id="homeLoanSlider" class="modern-slider"></div>
+            <div class="slider-labels">
+                <span>5 years</span>
+                <span id="maxHomeLoanTenure">35 years</span>
+            </div>
+        </div>
+        <!-- Keep the original slider but hide it -->
+        <input type="range" min="5" max="35" value="28" class="slider hidden" id="homeLoanTenure">
+    </div>
                             
-                            <div class="result-item">
-                                <div class="result-label">Preferred Equity Loan Tenure:</div>
-                                <div class="tenure-display" id="termLoanTenureDisplay">30 years</div>
-                                <div class="slider-container">
-                                    <input type="range" min="5" max="35" class="slider" id="termLoanTenure">
-                                    <div class="slider-labels">
-                                        <span>5 years</span>
-                                        <span id="maxTermLoanTenure">35 years</span>
-                                    </div>
-                                </div>
-                            </div>
+    <div class="result-item">
+        <div class="result-label">Preferred Equity Loan Tenure:</div>
+        <div class="tenure-display" id="termLoanTenureDisplay">30 years</div>
+        <div class="slider-container">
+            <div id="termLoanSlider" class="modern-slider"></div>
+            <div class="slider-labels">
+                <span>5 years</span>
+                <span id="maxTermLoanTenure">35 years</span>
+            </div>
+        </div>
+        <!-- Keep the original slider but hide it -->
+        <input type="range" min="5" max="35" value="30" class="slider hidden" id="termLoanTenure">
+    </div>
+</div>
                             
                             <div class="result-pair">
                                 <div class="result-item">
@@ -170,5 +179,6 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 </body>
 </html>
