@@ -8,6 +8,7 @@ const outstandingTermLoan = document.getElementById('outstandingTermLoan');
 const additionalTermLoan = document.getElementById('additionalTermLoan');
 const homeLoanTenure = document.getElementById('homeLoanTenure');
 const termLoanTenure = document.getElementById('termLoanTenure');
+const interestRate = document.getElementById('interestRate');
 const calculateButton = document.getElementById('calculateButton');
 
 // Get result elements
@@ -38,6 +39,12 @@ inputFields.forEach(input => {
 additionalTermLoan.addEventListener('input', () => {
     validateAdditionalLoan();
     calculateMonthlyInstallments(); // Update monthly values when additional loan changes
+});
+
+// Add event listener for interest rate
+interestRate.addEventListener('input', () => {
+    validateInterestRate();
+    calculateMonthlyInstallments(); // Update monthly values when interest rate changes
 });
 
 // Add event listener to calculate button
@@ -97,6 +104,22 @@ function validateInput(e) {
     }
 }
 
+// Validate interest rate
+function validateInterestRate() {
+    const rate = parseFloat(interestRate.value) || 0;
+    const errorElement = document.getElementById('interestRateError');
+    
+    if (isNaN(rate) || rate < 0 || rate > 10) {
+        errorElement.textContent = 'Please enter a valid interest rate between 0% and 10%';
+        errorElement.style.display = 'block';
+        interestRate.value = 2.5;
+        return false;
+    } else {
+        errorElement.style.display = 'none';
+        return true;
+    }
+}
+
 // Validate years since purchase against outstanding loan
 function validateYearsSincePurchase() {
     const years = parseFloat(yearsSincePurchase.value) || 0;
@@ -114,6 +137,36 @@ function validateYearsSincePurchase() {
         }
         return true;
     }
+}
+
+// Validate loan amounts against property value (Rule 1 & 2)
+function validateLoanAmounts() {
+    const pv = parseFloat(propertyValue.value) || 0;
+    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+    const termLoan = parseFloat(outstandingTermLoan.value) || 0;
+    const homeLoanErrorElement = document.getElementById('outstandingHomeLoanError');
+    const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
+    let isValid = true;
+    
+    // Rule 1: Outstanding home loan cannot be more than 75% of valuation
+    if (homeLoan > pv * 0.75) {
+        homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
+        homeLoanErrorElement.style.display = 'block';
+        isValid = false;
+    } else {
+        homeLoanErrorElement.style.display = 'none';
+    }
+    
+    // Rule 2: Outstanding equity loan cannot be more than 75% of valuation
+    if (termLoan > pv * 0.75) {
+        termLoanErrorElement.textContent = 'Outstanding equity loan cannot exceed 75% of property valuation.';
+        termLoanErrorElement.style.display = 'block';
+        isValid = false;
+    } else {
+        termLoanErrorElement.style.display = 'none';
+    }
+    
+    return isValid;
 }
 
 // Format currency
@@ -140,7 +193,7 @@ function calculateEligibleLoan() {
     if (eligibleAmount <= 0) {
         eligibleLoanValue.textContent = formatCurrency(0);
         eligibleLoanValue.className = 'result-value negative';
-        eligibilityMessage.textContent = 'Sorry, your property does not qualify for an additional term loan.';
+        eligibilityMessage.textContent = 'Sorry, your property does not qualify for an additional Equity Loan.';
         eligibilityMessage.style.display = 'block';
         eligibleLoanResult.className = 'result-item negative';
         loanDetails.classList.add('hidden');
@@ -291,22 +344,28 @@ function calculateMonthlyInstallments() {
     const homeTenureYears = parseInt(homeLoanTenure.value) || 14;
     const termTenureYears = parseInt(termLoanTenure.value) || 30;
     
-    const homeRate = 0.025; // 2.5% p.a
-    const termRate = 0.025; // 2.5% p.a
+    // Use the interest rate from the field instead of a fixed value
+    const rate = parseFloat(interestRate.value) / 100 || 0.025; // default to 2.5% if invalid
     
     if (homeLoan > 0) {
-        const homeMonthly = calculatePMT(homeRate, homeTenureYears * 12, homeLoan);
+        const homeMonthly = calculatePMT(rate, homeTenureYears * 12, homeLoan);
         homeLoanMonthlyValue.textContent = formatCurrency(homeMonthly);
     } else {
         homeLoanMonthlyValue.textContent = formatCurrency(0);
     }
     
     if (totalTermLoan > 0) {
-        const termMonthly = calculatePMT(termRate, termTenureYears * 12, totalTermLoan);
+        const termMonthly = calculatePMT(rate, termTenureYears * 12, totalTermLoan);
         termLoanMonthlyValue.textContent = formatCurrency(termMonthly);
     } else {
         termLoanMonthlyValue.textContent = formatCurrency(0);
     }
+    
+    // Update the payment method display to show current interest rate
+    const rateDisplay = document.querySelectorAll('.rate-display');
+    rateDisplay.forEach(element => {
+        element.textContent = `(Using ${rate * 100}% p.a interest rate)`;
+    });
 }
 
 // Initialize the noUiSlider sliders with improved UI
@@ -542,6 +601,7 @@ function calculateAll() {
     // Additional validations
     if (!validateAgePurchase()) isValid = false;
     if (!validateYearsSincePurchase()) isValid = false;
+    if (!validateLoanAmounts()) isValid = false; // Added the new validation function
     
     if (!isValid) {
         errorMessage.textContent = 'Please correct all input errors before calculating.';
@@ -564,3 +624,46 @@ function calculateAll() {
     
     calculateMonthlyInstallments();
 }
+
+// Iframe resizer for Term Loan Calculator
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to send height to parent window with extra padding
+    function sendHeight() {
+        // Get the document height and add some extra padding (20px)
+        const height = document.body.scrollHeight + 20;
+        window.parent.postMessage({ type: 'setHeight', height: height }, '*');
+    }
+
+    // Send height on important events
+    const events = ['load', 'resize', 'input', 'change'];
+    events.forEach(event => {
+        window.addEventListener(event, sendHeight);
+    });
+
+    // Watch for DOM changes
+    const observer = new MutationObserver(function() {
+        // Small delay to ensure all DOM changes are completed
+        setTimeout(sendHeight, 50);
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true
+    });
+
+    // Handle height requests from parent window
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'requestHeight') {
+            sendHeight();
+        }
+    });
+
+    // Initial height send with slight delay to ensure full rendering
+    setTimeout(sendHeight, 300);
+
+    // Also send after all images and assets are loaded
+    window.addEventListener('load', function() {
+        setTimeout(sendHeight, 500);
+    });
+});

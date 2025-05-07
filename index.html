@@ -156,7 +156,15 @@
         <input type="range" min="5" max="35" value="30" class="slider hidden" id="termLoanTenure">
     </div>
 </div>
-                            
+                            <!-- Add this to the inputs-section, after the existing loan information inputs -->
+<div class="input-group">
+    <label class="input-label" for="interestRate">Interest Rate (%)</label>
+    <div class="input-container">
+        <div class="input-icon">%</div>
+        <input type="number" id="interestRate" placeholder="E.g 2.5" min="0" max="10" step="0.1" value="2.5">
+    </div>
+    <div class="field-error" id="interestRateError"></div>
+</div>
                             <div class="result-pair">
                                 <div class="result-item">
                                     <div class="result-label">Home Loan Monthly Instalment:</div>
