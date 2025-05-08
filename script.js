@@ -61,6 +61,95 @@ document.addEventListener('DOMContentLoaded', function() {
     if (termLoanTenure) termLoanTenure.style.display = 'none';
 });
 
+// Add real-time validation for years since purchase vs outstanding loan
+yearsSincePurchase.addEventListener('input', function() {
+    validateAgePurchase(); // Keep the existing validation
+    validateYearsSincePurchase(); // Add the new validation
+});
+
+outstandingHomeLoan.addEventListener('input', function() {
+    validateInput({ target: outstandingHomeLoan }); // Keep the existing validation
+    validateYearsSincePurchase(); // Check if years constraint is violated when loan changes
+});
+
+// Fix the validateYearsSincePurchase function to be more robust
+function validateYearsSincePurchase() {
+    const years = parseFloat(yearsSincePurchase.value) || 0;
+    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+    const errorElement = document.getElementById('yearsSincePurchaseError');
+    
+    if (years >= 30 && homeLoan > 0) {
+        errorElement.textContent = 'For properties owned 30+ years, outstanding home loan must be $0.';
+        errorElement.style.display = 'block';
+        return false;
+    } else {
+        // Only clear this specific error message if it exists
+        // This prevents it from hiding age-purchase validation errors
+        if (errorElement.textContent.includes('For properties owned 30+ years')) {
+            errorElement.style.display = 'none';
+        }
+        return true;
+    }
+}
+
+// Add these event listeners after your existing event listeners
+
+// Add real-time validation for loan amounts against property value
+propertyValue.addEventListener('input', function() {
+    validateInput({ target: propertyValue }); // Keep the existing validation
+    validateLoanAmounts(); // Check loan amounts against property value
+});
+
+outstandingHomeLoan.addEventListener('input', function() {
+    validateInput({ target: outstandingHomeLoan }); // Keep the existing validation
+    validateYearsSincePurchase(); // From previous fix
+    validateLoanAmounts(); // Check loan amounts against property value
+});
+
+outstandingTermLoan.addEventListener('input', function() {
+    validateInput({ target: outstandingTermLoan }); // Keep the existing validation
+    validateLoanAmounts(); // Check loan amounts against property value
+});
+
+// The validateLoanAmounts function can remain as is, or you can enhance it:
+function validateLoanAmounts() {
+    const pv = parseFloat(propertyValue.value) || 0;
+    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+    const termLoan = parseFloat(outstandingTermLoan.value) || 0;
+    const homeLoanErrorElement = document.getElementById('outstandingHomeLoanError');
+    const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
+    let isValid = true;
+    
+    // Only validate if property value has been entered
+    if (pv > 0) {
+        // Rule 1: Outstanding home loan cannot be more than 75% of valuation
+        if (homeLoan > pv * 0.75) {
+            homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
+            homeLoanErrorElement.style.display = 'block';
+            isValid = false;
+        } else {
+            // Only clear this specific error message
+            if (homeLoanErrorElement.textContent.includes('75% of property valuation')) {
+                homeLoanErrorElement.style.display = 'none';
+            }
+        }
+        
+        // Rule 2: Outstanding equity loan cannot be more than 75% of valuation
+        if (termLoan > pv * 0.75) {
+            termLoanErrorElement.textContent = 'Outstanding equity loan cannot exceed 75% of property valuation.';
+            termLoanErrorElement.style.display = 'block';
+            isValid = false;
+        } else {
+            // Only clear this specific error message
+            if (termLoanErrorElement.textContent.includes('75% of property valuation')) {
+                termLoanErrorElement.style.display = 'none';
+            }
+        }
+    }
+    
+    return isValid;
+}
+
 // Validate average age vs years since purchase
 function validateAgePurchase() {
     const age = parseFloat(averageAge.value) || 0;
@@ -121,53 +210,53 @@ function validateInterestRate() {
 }
 
 // Validate years since purchase against outstanding loan
-function validateYearsSincePurchase() {
-    const years = parseFloat(yearsSincePurchase.value) || 0;
-    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-    const errorElement = document.getElementById('yearsSincePurchaseError');
+// function validateYearsSincePurchase() {
+//     const years = parseFloat(yearsSincePurchase.value) || 0;
+//     const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+//     const errorElement = document.getElementById('yearsSincePurchaseError');
     
-    if (years >= 30 && homeLoan > 0) {
-        errorElement.textContent = 'For properties owned 30+ years, outstanding home loan must be $0.';
-        errorElement.style.display = 'block';
-        return false;
-    } else {
-        // Only clear if there's no age-purchase validation error
-        if (validateAgePurchase()) {
-            errorElement.style.display = 'none';
-        }
-        return true;
-    }
-}
+//     if (years >= 30 && homeLoan > 0) {
+//         errorElement.textContent = 'For properties owned 30+ years, outstanding home loan must be $0.';
+//         errorElement.style.display = 'block';
+//         return false;
+//     } else {
+//         // Only clear if there's no age-purchase validation error
+//         if (validateAgePurchase()) {
+//             errorElement.style.display = 'none';
+//         }
+//         return true;
+//     }
+// }
 
 // Validate loan amounts against property value (Rule 1 & 2)
-function validateLoanAmounts() {
-    const pv = parseFloat(propertyValue.value) || 0;
-    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-    const termLoan = parseFloat(outstandingTermLoan.value) || 0;
-    const homeLoanErrorElement = document.getElementById('outstandingHomeLoanError');
-    const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
-    let isValid = true;
+// function validateLoanAmounts() {
+//     const pv = parseFloat(propertyValue.value) || 0;
+//     const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+//     const termLoan = parseFloat(outstandingTermLoan.value) || 0;
+//     const homeLoanErrorElement = document.getElementById('outstandingHomeLoanError');
+//     const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
+//     let isValid = true;
     
-    // Rule 1: Outstanding home loan cannot be more than 75% of valuation
-    if (homeLoan > pv * 0.75) {
-        homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
-        homeLoanErrorElement.style.display = 'block';
-        isValid = false;
-    } else {
-        homeLoanErrorElement.style.display = 'none';
-    }
+//     // Rule 1: Outstanding home loan cannot be more than 75% of valuation
+//     if (homeLoan > pv * 0.75) {
+//         homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
+//         homeLoanErrorElement.style.display = 'block';
+//         isValid = false;
+//     } else {
+//         homeLoanErrorElement.style.display = 'none';
+//     }
     
-    // Rule 2: Outstanding equity loan cannot be more than 75% of valuation
-    if (termLoan > pv * 0.75) {
-        termLoanErrorElement.textContent = 'Outstanding equity loan cannot exceed 75% of property valuation.';
-        termLoanErrorElement.style.display = 'block';
-        isValid = false;
-    } else {
-        termLoanErrorElement.style.display = 'none';
-    }
+//     // Rule 2: Outstanding equity loan cannot be more than 75% of valuation
+//     if (termLoan > pv * 0.75) {
+//         termLoanErrorElement.textContent = 'Outstanding equity loan cannot exceed 75% of property valuation.';
+//         termLoanErrorElement.style.display = 'block';
+//         isValid = false;
+//     } else {
+//         termLoanErrorElement.style.display = 'none';
+//     }
     
-    return isValid;
-}
+//     return isValid;
+// }
 
 // Format currency
 function formatCurrency(amount) {
