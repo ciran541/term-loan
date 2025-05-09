@@ -78,7 +78,12 @@ inputFields.forEach(input => {
         input.addEventListener('input', validateInput);
     }
 });
-
+// Add event listeners for combined validation
+[propertyValue, outstandingHomeLoan, outstandingTermLoan].forEach(input => {
+    input.addEventListener('input', function() {
+        validateLoanAmounts();
+    });
+});
 // Modified event listener for additionalTermLoan
 additionalTermLoan.addEventListener('input', () => {
     validateAdditionalLoan();
@@ -155,6 +160,7 @@ function validateLoanAmounts() {
     let isValid = true;
     
     if (pv > 0) {
+        // Individual loan validations (existing)
         if (homeLoan > pv * 0.75) {
             homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
             homeLoanErrorElement.style.display = 'block';
@@ -174,9 +180,45 @@ function validateLoanAmounts() {
                 termLoanErrorElement.style.display = 'none';
             }
         }
+        
+        // NEW: Combined loan validation
+        if (homeLoan + termLoan > pv * 0.75) {
+            const combinedErrorElement = document.getElementById('combinedLoanError') || 
+                createCombinedErrorElement();
+            combinedErrorElement.textContent = 'Combined home and equity loans cannot exceed 75% of property valuation.';
+            combinedErrorElement.style.display = 'block';
+            isValid = false;
+        } else {
+            const combinedErrorElement = document.getElementById('combinedLoanError');
+            if (combinedErrorElement) {
+                combinedErrorElement.style.display = 'none';
+            }
+        }
     }
     
     return isValid;
+}
+
+// Helper function to create the combined error element if it doesn't exist
+function createCombinedErrorElement() {
+    const combinedErrorElement = document.createElement('div');
+    combinedErrorElement.id = 'combinedLoanError';
+    combinedErrorElement.className = 'error-message';
+    
+    // Insert after the term loan error element
+    const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
+    if (termLoanErrorElement && termLoanErrorElement.parentNode) {
+        termLoanErrorElement.parentNode.insertBefore(
+            combinedErrorElement, 
+            termLoanErrorElement.nextSibling
+        );
+    } else {
+        // Fallback: append to the form
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(combinedErrorElement);
+    }
+    
+    return combinedErrorElement;
 }
 
 // Validate average age vs years since purchase
@@ -249,12 +291,26 @@ function calculatePMT(rate, nper, pv) {
     return pv * monthlyRate * Math.pow(1 + monthlyRate, nper) / (Math.pow(1 + monthlyRate, nper) - 1);
 }
 
-// Calculate eligible additional term loan
 function calculateEligibleLoan() {
     const pv = parseNumber(propertyValue.value) || 0;
     const cpf = parseNumber(cpfUsed.value) || 0;
     const homeLoan = parseNumber(outstandingHomeLoan.value) || 0;
     const termLoan = parseNumber(outstandingTermLoan.value) || 0;
+    
+    // Check if combined loans already exceed the 75% limit
+    if (homeLoan + termLoan > pv * 0.75) {
+        eligibleLoanValue.textContent = formatCurrency(0);
+        eligibleLoanValue.className = 'result-value negative';
+        eligibilityMessage.textContent = 'Combined home and equity loans already exceed 75% of property valuation.';
+        eligibilityMessage.style.display = 'block';
+        eligibleLoanResult.className = 'result-item negative';
+        loanDetails.classList.add('hidden');
+        additionalTermLoan.value = '0';
+        additionalTermLoan.max = 0;
+        additionalLoanMessage.textContent = '';
+        additionalLoanMessage.style.display = 'none';
+        return 0;
+    }
     
     const eligibleAmount = (pv * 0.75) - homeLoan - termLoan - cpf;
     
