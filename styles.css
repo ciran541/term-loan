@@ -42,8 +42,8 @@ body {
 
 .calculator {
   background: #fff;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  /* border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow); */
   overflow: hidden;
   width: 100%;
 }
@@ -749,7 +749,7 @@ input:focus, button:focus {
 /* Fix for notched displays */
 @supports (padding: max(0px)) {
   .container {
-    padding-left: max(15px, env(safe-area-inset-left));
+    /* padding-left: max(15px, env(safe-area-inset-left)); */
     padding-right: max(15px, env(safe-area-inset-right));
   }
 }
