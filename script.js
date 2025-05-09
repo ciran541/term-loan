@@ -1,3 +1,18 @@
+// Format number with commas for input fields
+function formatNumberWithCommas(value) {
+    value = value.replace(/[^0-9.]/g, '');
+    const parts = value.split('.');
+    let integerPart = parts[0];
+    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return integerPart;
+}
+
+// Parse number by removing commas
+function parseNumber(value) {
+    if (!value) return NaN;
+    return parseFloat(value.replace(/,/g, ''));
+}
+
 // Get all input elements
 const propertyValue = document.getElementById('propertyValue');
 const cpfUsed = document.getElementById('cpfUsed');
@@ -29,22 +44,51 @@ const initialMessage = document.getElementById('initialMessage');
 const calculationResults = document.getElementById('calculationResults');
 const errorMessage = document.getElementById('error');
 
+// Add event listeners for comma formatting
+[propertyValue, cpfUsed, outstandingHomeLoan, outstandingTermLoan, additionalTermLoan].forEach(input => {
+    input.addEventListener('input', function(e) {
+        const cursorPosition = e.target.selectionStart;
+        const valueBefore = e.target.value;
+        const formattedValue = formatNumberWithCommas(e.target.value);
+        e.target.value = formattedValue;
+        
+        const commasBeforeCursor = (valueBefore.slice(0, cursorPosition).match(/,/g) || []).length;
+        const newCommasBeforeCursor = (formattedValue.slice(0, cursorPosition).match(/,/g) || []).length;
+        const cursorAdjustment = newCommasBeforeCursor - commasBeforeCursor;
+        e.target.setSelectionRange(cursorPosition + cursorAdjustment, cursorPosition + cursorAdjustment);
+        
+        validateInput(e);
+        if (e.target === additionalTermLoan) {
+            validateAdditionalLoan();
+            calculateMonthlyInstallments();
+        }
+        if (e.target === outstandingHomeLoan || e.target === propertyValue) {
+            validateLoanAmounts();
+        }
+        if (e.target === outstandingTermLoan) {
+            validateLoanAmounts();
+        }
+    });
+});
+
 // Add event listeners to input fields for validation only
 const inputFields = [propertyValue, cpfUsed, averageAge, yearsSincePurchase, outstandingHomeLoan, outstandingTermLoan];
 inputFields.forEach(input => {
-    input.addEventListener('input', validateInput);
+    if (!input.classList.contains('comma-input')) {
+        input.addEventListener('input', validateInput);
+    }
 });
 
 // Modified event listener for additionalTermLoan
 additionalTermLoan.addEventListener('input', () => {
     validateAdditionalLoan();
-    calculateMonthlyInstallments(); // Update monthly values when additional loan changes
+    calculateMonthlyInstallments();
 });
 
 // Add event listener for interest rate
 interestRate.addEventListener('input', () => {
     validateInterestRate();
-    calculateMonthlyInstallments(); // Update monthly values when interest rate changes
+    calculateMonthlyInstallments();
 });
 
 // Add event listener to calculate button
@@ -63,19 +107,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Add real-time validation for years since purchase vs outstanding loan
 yearsSincePurchase.addEventListener('input', function() {
-    validateAgePurchase(); // Keep the existing validation
-    validateYearsSincePurchase(); // Add the new validation
+    validateAgePurchase();
+    validateYearsSincePurchase();
 });
 
 outstandingHomeLoan.addEventListener('input', function() {
-    validateInput({ target: outstandingHomeLoan }); // Keep the existing validation
-    validateYearsSincePurchase(); // Check if years constraint is violated when loan changes
+    validateYearsSincePurchase();
 });
 
 // Fix the validateYearsSincePurchase function to be more robust
 function validateYearsSincePurchase() {
     const years = parseFloat(yearsSincePurchase.value) || 0;
-    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
+    const homeLoan = parseNumber(outstandingHomeLoan.value) || 0;
     const errorElement = document.getElementById('yearsSincePurchaseError');
     
     if (years >= 30 && homeLoan > 0) {
@@ -83,8 +126,6 @@ function validateYearsSincePurchase() {
         errorElement.style.display = 'block';
         return false;
     } else {
-        // Only clear this specific error message if it exists
-        // This prevents it from hiding age-purchase validation errors
         if (errorElement.textContent.includes('For properties owned 30+ years')) {
             errorElement.style.display = 'none';
         }
@@ -92,55 +133,43 @@ function validateYearsSincePurchase() {
     }
 }
 
-// Add these event listeners after your existing event listeners
-
 // Add real-time validation for loan amounts against property value
 propertyValue.addEventListener('input', function() {
-    validateInput({ target: propertyValue }); // Keep the existing validation
-    validateLoanAmounts(); // Check loan amounts against property value
+    validateLoanAmounts();
 });
 
 outstandingHomeLoan.addEventListener('input', function() {
-    validateInput({ target: outstandingHomeLoan }); // Keep the existing validation
-    validateYearsSincePurchase(); // From previous fix
-    validateLoanAmounts(); // Check loan amounts against property value
+    validateLoanAmounts();
 });
 
 outstandingTermLoan.addEventListener('input', function() {
-    validateInput({ target: outstandingTermLoan }); // Keep the existing validation
-    validateLoanAmounts(); // Check loan amounts against property value
+    validateLoanAmounts();
 });
 
-// The validateLoanAmounts function can remain as is, or you can enhance it:
 function validateLoanAmounts() {
-    const pv = parseFloat(propertyValue.value) || 0;
-    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-    const termLoan = parseFloat(outstandingTermLoan.value) || 0;
+    const pv = parseNumber(propertyValue.value) || 0;
+    const homeLoan = parseNumber(outstandingHomeLoan.value) || 0;
+    const termLoan = parseNumber(outstandingTermLoan.value) || 0;
     const homeLoanErrorElement = document.getElementById('outstandingHomeLoanError');
     const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
     let isValid = true;
     
-    // Only validate if property value has been entered
     if (pv > 0) {
-        // Rule 1: Outstanding home loan cannot be more than 75% of valuation
         if (homeLoan > pv * 0.75) {
             homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
             homeLoanErrorElement.style.display = 'block';
             isValid = false;
         } else {
-            // Only clear this specific error message
             if (homeLoanErrorElement.textContent.includes('75% of property valuation')) {
                 homeLoanErrorElement.style.display = 'none';
             }
         }
         
-        // Rule 2: Outstanding equity loan cannot be more than 75% of valuation
         if (termLoan > pv * 0.75) {
             termLoanErrorElement.textContent = 'Outstanding equity loan cannot exceed 75% of property valuation.';
             termLoanErrorElement.style.display = 'block';
             isValid = false;
         } else {
-            // Only clear this specific error message
             if (termLoanErrorElement.textContent.includes('75% of property valuation')) {
                 termLoanErrorElement.style.display = 'none';
             }
@@ -170,7 +199,7 @@ function validateAgePurchase() {
 function validateInput(e) {
     const input = e.target;
     const id = input.id;
-    const value = parseFloat(input.value);
+    const value = input.classList.contains('comma-input') ? parseNumber(input.value) : parseFloat(input.value);
     const errorElement = document.getElementById(id + 'Error');
     
     if (input.value === '') {
@@ -178,7 +207,6 @@ function validateInput(e) {
         return false;
     }
     
-    // Update max age to 70 for average age
     if (id === 'averageAge') {
         input.max = 70;
     }
@@ -209,55 +237,6 @@ function validateInterestRate() {
     }
 }
 
-// Validate years since purchase against outstanding loan
-// function validateYearsSincePurchase() {
-//     const years = parseFloat(yearsSincePurchase.value) || 0;
-//     const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-//     const errorElement = document.getElementById('yearsSincePurchaseError');
-    
-//     if (years >= 30 && homeLoan > 0) {
-//         errorElement.textContent = 'For properties owned 30+ years, outstanding home loan must be $0.';
-//         errorElement.style.display = 'block';
-//         return false;
-//     } else {
-//         // Only clear if there's no age-purchase validation error
-//         if (validateAgePurchase()) {
-//             errorElement.style.display = 'none';
-//         }
-//         return true;
-//     }
-// }
-
-// Validate loan amounts against property value (Rule 1 & 2)
-// function validateLoanAmounts() {
-//     const pv = parseFloat(propertyValue.value) || 0;
-//     const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-//     const termLoan = parseFloat(outstandingTermLoan.value) || 0;
-//     const homeLoanErrorElement = document.getElementById('outstandingHomeLoanError');
-//     const termLoanErrorElement = document.getElementById('outstandingTermLoanError');
-//     let isValid = true;
-    
-//     // Rule 1: Outstanding home loan cannot be more than 75% of valuation
-//     if (homeLoan > pv * 0.75) {
-//         homeLoanErrorElement.textContent = 'Outstanding home loan cannot exceed 75% of property valuation.';
-//         homeLoanErrorElement.style.display = 'block';
-//         isValid = false;
-//     } else {
-//         homeLoanErrorElement.style.display = 'none';
-//     }
-    
-//     // Rule 2: Outstanding equity loan cannot be more than 75% of valuation
-//     if (termLoan > pv * 0.75) {
-//         termLoanErrorElement.textContent = 'Outstanding equity loan cannot exceed 75% of property valuation.';
-//         termLoanErrorElement.style.display = 'block';
-//         isValid = false;
-//     } else {
-//         termLoanErrorElement.style.display = 'none';
-//     }
-    
-//     return isValid;
-// }
-
 // Format currency
 function formatCurrency(amount) {
     return 'SGD ' + Math.round(amount).toLocaleString('en-SG');
@@ -272,10 +251,10 @@ function calculatePMT(rate, nper, pv) {
 
 // Calculate eligible additional term loan
 function calculateEligibleLoan() {
-    const pv = parseFloat(propertyValue.value) || 0;
-    const cpf = parseFloat(cpfUsed.value) || 0;
-    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-    const termLoan = parseFloat(outstandingTermLoan.value) || 0;
+    const pv = parseNumber(propertyValue.value) || 0;
+    const cpf = parseNumber(cpfUsed.value) || 0;
+    const homeLoan = parseNumber(outstandingHomeLoan.value) || 0;
+    const termLoan = parseNumber(outstandingTermLoan.value) || 0;
     
     const eligibleAmount = (pv * 0.75) - homeLoan - termLoan - cpf;
     
@@ -286,7 +265,7 @@ function calculateEligibleLoan() {
         eligibilityMessage.style.display = 'block';
         eligibleLoanResult.className = 'result-item negative';
         loanDetails.classList.add('hidden');
-        additionalTermLoan.value = 0;
+        additionalTermLoan.value = '0';
         additionalTermLoan.max = 0;
         additionalLoanMessage.textContent = '';
         additionalLoanMessage.style.display = 'none';
@@ -300,7 +279,7 @@ function calculateEligibleLoan() {
         loanDetails.classList.remove('hidden');
         
         additionalTermLoan.max = eligibleAmount;
-        additionalTermLoan.value = eligibleAmount;
+        additionalTermLoan.value = formatNumberWithCommas(eligibleAmount.toString());
         additionalLoanMessage.textContent = '';
         additionalLoanMessage.style.display = 'none';
         
@@ -403,16 +382,16 @@ function updateTermLoanTenure(value) {
 // Validate additional term loan amount
 function validateAdditionalLoan() {
     const eligibleAmount = parseFloat(additionalTermLoan.max) || 0;
-    const additionalAmount = parseFloat(additionalTermLoan.value) || 0;
+    const additionalAmount = parseNumber(additionalTermLoan.value) || 0;
     
     if (additionalAmount > eligibleAmount) {
         additionalLoanMessage.textContent = 'Amount cannot exceed eligible amount.';
         additionalLoanMessage.style.display = 'block';
-        additionalTermLoan.value = eligibleAmount;
+        additionalTermLoan.value = formatNumberWithCommas(eligibleAmount.toString());
     } else if (additionalAmount < 0) {
         additionalLoanMessage.textContent = 'Amount cannot be negative.';
         additionalLoanMessage.style.display = 'block';
-        additionalTermLoan.value = 0;
+        additionalTermLoan.value = '0';
     } else {
         additionalLoanMessage.textContent = '';
         additionalLoanMessage.style.display = 'none';
@@ -421,20 +400,17 @@ function validateAdditionalLoan() {
 
 // Calculate monthly installments
 function calculateMonthlyInstallments() {
-    // Only calculate if results are visible
     if (calculationResults.classList.contains('hidden')) {
         return;
     }
     
-    const homeLoan = parseFloat(outstandingHomeLoan.value) || 0;
-    const additionalLoan = parseFloat(additionalTermLoan.value) || 0;
-    const outstandingTerm = parseFloat(outstandingTermLoan.value) || 0;
+    const homeLoan = parseNumber(outstandingHomeLoan.value) || 0;
+    const additionalLoan = parseNumber(additionalTermLoan.value) || 0;
+    const outstandingTerm = parseNumber(outstandingTermLoan.value) || 0;
     const totalTermLoan = additionalLoan + outstandingTerm;
     const homeTenureYears = parseInt(homeLoanTenure.value) || 14;
     const termTenureYears = parseInt(termLoanTenure.value) || 30;
-    
-    // Use the interest rate from the field instead of a fixed value
-    const rate = parseFloat(interestRate.value) / 100 || 0.025; // default to 2.5% if invalid
+    const rate = parseFloat(interestRate.value) / 100 || 0.025;
     
     if (homeLoan > 0) {
         const homeMonthly = calculatePMT(rate, homeTenureYears * 12, homeLoan);
@@ -450,30 +426,25 @@ function calculateMonthlyInstallments() {
         termLoanMonthlyValue.textContent = formatCurrency(0);
     }
     
-    // Update the payment method display to show current interest rate
-    const rateDisplay = document.querySelectorAll('.rate-display');
+    const rateDisplay = document.querySelectorAll('.payment-method');
     rateDisplay.forEach(element => {
-        element.textContent = `(Using ${rate * 100}% p.a interest rate)`;
+        element.textContent = `Payment method: ${element.textContent.includes('Cash/CPF') ? 'Cash/CPF' : 'Cash Only'} (Using ${rate * 100}% p.a interest rate)`;
     });
 }
 
 // Initialize the noUiSlider sliders with improved UI
 function initializeSliders() {
-    // Get slider elements
     const homeLoanSlider = document.getElementById('homeLoanSlider');
     const termLoanSlider = document.getElementById('termLoanSlider');
     const homeLoanTenureDisplay = document.getElementById('homeLoanTenureDisplay');
     const termLoanTenureDisplay = document.getElementById('termLoanTenureDisplay');
     
-    // Get hidden range inputs
     const homeLoanTenure = document.getElementById('homeLoanTenure');
     const termLoanTenure = document.getElementById('termLoanTenure');
     
-    // Update max labels with correct values
     document.getElementById('maxHomeLoanTenure').textContent = homeLoanTenure.max + ' years';
     document.getElementById('maxTermLoanTenure').textContent = termLoanTenure.max + ' years';
     
-    // Remove old sliders if they exist
     if (homeLoanSlider.noUiSlider) {
         homeLoanSlider.noUiSlider.destroy();
     }
@@ -481,13 +452,11 @@ function initializeSliders() {
         termLoanSlider.noUiSlider.destroy();
     }
     
-    // Get initial values and ranges
     const homeLoanValue = parseInt(homeLoanTenure.value) || 14;
     const termLoanValue = parseInt(termLoanTenure.value) || 30;
     const maxHomeTenure = parseInt(homeLoanTenure.max) || 35;
     const maxTermTenure = parseInt(termLoanTenure.max) || 35;
     
-    // Initialize Home Loan Slider with improved settings
     noUiSlider.create(homeLoanSlider, {
         start: homeLoanValue,
         connect: [true, false],
@@ -504,10 +473,9 @@ function initializeSliders() {
                 return parseInt(value);
             }
         },
-        tooltips: false // We'll use our custom bubble instead
+        tooltips: false
     });
 
-    // Initialize Term Loan Slider with improved settings
     noUiSlider.create(termLoanSlider, {
         start: termLoanValue,
         connect: [true, false],
@@ -524,10 +492,9 @@ function initializeSliders() {
                 return parseInt(value);
             }
         },
-        tooltips: false // We'll use our custom bubble instead
+        tooltips: false
     });
 
-    // Create bubbles for handles
     const homeLoanHandle = homeLoanSlider.querySelector('.noUi-handle');
     const termLoanHandle = termLoanSlider.querySelector('.noUi-handle');
     
@@ -539,7 +506,6 @@ function initializeSliders() {
     termLoanBubble.className = 'value-bubble';
     termLoanHandle.appendChild(termLoanBubble);
 
-    // Add focus elements to make it clear where the slider is positioned
     const homeLoanFocus = document.createElement('div');
     homeLoanFocus.className = 'handle-focus';
     homeLoanHandle.appendChild(homeLoanFocus);
@@ -548,50 +514,31 @@ function initializeSliders() {
     termLoanFocus.className = 'handle-focus';
     termLoanHandle.appendChild(termLoanFocus);
 
-    // Update display values and bubbles
     homeLoanSlider.noUiSlider.on('update', function(values, handle) {
         const value = values[handle];
         homeLoanTenureDisplay.textContent = value + ' years';
         homeLoanBubble.textContent = value + ' yrs';
-        
-        // Update the original range input for compatibility
         homeLoanTenure.value = value;
-        
-        // Animate the display text on change
         homeLoanTenureDisplay.classList.add('value-updated');
         setTimeout(() => {
             homeLoanTenureDisplay.classList.remove('value-updated');
         }, 300);
-        
-        // Trigger calculation
-        if (typeof calculateMonthlyInstallments === 'function') {
-            calculateMonthlyInstallments();
-        }
+        calculateMonthlyInstallments();
     });
 
     termLoanSlider.noUiSlider.on('update', function(values, handle) {
         const value = values[handle];
         termLoanTenureDisplay.textContent = value + ' years';
         termLoanBubble.textContent = value + ' yrs';
-        
-        // Update the original range input for compatibility
         termLoanTenure.value = value;
-        
-        // Animate the display text on change
         termLoanTenureDisplay.classList.add('value-updated');
         setTimeout(() => {
             termLoanTenureDisplay.classList.remove('value-updated');
         }, 300);
-        
-        // Trigger calculation
-        if (typeof calculateMonthlyInstallments === 'function') {
-            calculateMonthlyInstallments();
-        }
+        calculateMonthlyInstallments();
     });
 
-    // Enhanced interaction effects
     [homeLoanHandle, termLoanHandle].forEach(handle => {
-        // Show bubble on active state
         handle.addEventListener('mousedown', function() {
             this.classList.add('noUi-active');
             const bubble = this.querySelector('.value-bubble');
@@ -604,7 +551,6 @@ function initializeSliders() {
             if (bubble) bubble.classList.add('bubble-active');
         });
         
-        // Hide bubble when mouse up anywhere on document
         document.addEventListener('mouseup', function() {
             handle.classList.remove('noUi-active');
             const bubble = handle.querySelector('.value-bubble');
@@ -617,7 +563,6 @@ function initializeSliders() {
             if (bubble) bubble.classList.remove('bubble-active');
         });
         
-        // Show bubble on hover
         handle.addEventListener('mouseover', function() {
             const bubble = this.querySelector('.value-bubble');
             if (bubble) bubble.classList.add('bubble-hover');
@@ -631,28 +576,23 @@ function initializeSliders() {
         });
     });
     
-    // Add visual indication when slider is near the edge
     function checkSliderPosition(slider, handle) {
         const range = slider.noUiSlider.options.range;
         const value = slider.noUiSlider.get();
         const min = range.min;
         const max = range.max;
         
-        // Remove all position classes
         handle.classList.remove('at-min', 'at-max', 'near-min', 'near-max');
         
-        // Add appropriate classes based on position
         if (value <= min) handle.classList.add('at-min');
         else if (value >= max) handle.classList.add('at-max');
         else if (value <= min + (max - min) * 0.1) handle.classList.add('near-min');
         else if (value >= max - (max - min) * 0.1) handle.classList.add('near-max');
     }
     
-    // Check initial positions
     checkSliderPosition(homeLoanSlider, homeLoanHandle);
     checkSliderPosition(termLoanSlider, termLoanHandle);
     
-    // Update positions on slider change
     homeLoanSlider.noUiSlider.on('update', function() {
         checkSliderPosition(homeLoanSlider, homeLoanHandle);
     });
@@ -661,7 +601,6 @@ function initializeSliders() {
         checkSliderPosition(termLoanSlider, termLoanHandle);
     });
     
-    // Make sure sliders are fully initialized and visible
     setTimeout(() => {
         homeLoanSlider.classList.add('slider-initialized');
         termLoanSlider.classList.add('slider-initialized');
@@ -670,7 +609,6 @@ function initializeSliders() {
 
 // Call the initialization function when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if noUiSlider is loaded
     if (typeof noUiSlider !== 'undefined') {
         initializeSliders();
     } else {
@@ -680,17 +618,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Calculate all values
 function calculateAll() {
-    // Validate all inputs before calculating
     let isValid = true;
     inputFields.forEach(input => {
         const valid = validateInput({ target: input });
         if (!valid) isValid = false;
     });
     
-    // Additional validations
     if (!validateAgePurchase()) isValid = false;
     if (!validateYearsSincePurchase()) isValid = false;
-    if (!validateLoanAmounts()) isValid = false; // Added the new validation function
+    if (!validateLoanAmounts()) isValid = false;
     
     if (!isValid) {
         errorMessage.textContent = 'Please correct all input errors before calculating.';
@@ -702,13 +638,12 @@ function calculateAll() {
     initialMessage.classList.add('hidden');
     calculationResults.classList.remove('hidden');
     
-    outstandingHomeLoanValue.textContent = formatCurrency(parseFloat(outstandingHomeLoan.value) || 0);
-    outstandingTermLoanValue.textContent = formatCurrency(parseFloat(outstandingTermLoan.value) || 0);
+    outstandingHomeLoanValue.textContent = formatCurrency(parseNumber(outstandingHomeLoan.value) || 0);
+    outstandingTermLoanValue.textContent = formatCurrency(parseNumber(outstandingTermLoan.value) || 0);
     
     calculateEligibleLoan();
     calculateMaxTenures();
     
-    // Initialize sliders after calculating max tenures
     initializeSliders();
     
     calculateMonthlyInstallments();

@@ -29,12 +29,15 @@ body {
   background-color: var(--light-bg);
   color: #333;
   line-height: 1.6;
+  font-size: 16px;
 }
 
+/* Mobile-first approach - base styles for all devices */
 .container {
+  width: 100%;
   max-width: 1400px;
-  margin: 30px auto;
-  padding: 0 20px;
+  margin: 15px auto;
+  padding: 0 15px;
 }
 
 .calculator {
@@ -42,35 +45,34 @@ body {
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   overflow: hidden;
+  width: 100%;
 }
 
 .calculator-content {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
 }
 
 .inputs-section {
-  flex: 0.8;
-  min-width: 300px;
-  padding: 20px;
-  border-right: 1px solid var(--border-color);
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
   background-color: #fff;
+  width: 100%;
 }
 
 .results-section {
-  flex: 1.2;
-  min-width: 300px;
-  padding: 30px;
+  padding: 20px 15px;
   background-color: #fafcfe;
+  width: 100%;
 }
 
 .section-title {
   font-size: 18px;
   color: var(--primary-color);
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   font-weight: 600;
   position: relative;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
 .section-title::after {
@@ -106,14 +108,14 @@ body {
 }
 
 .input-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .input-label {
   display: block;
   font-weight: 600;
   color: var(--primary-color);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-size: 14px;
 }
 
@@ -128,14 +130,14 @@ body {
 }
 
 .input-icon {
-  padding: 10px 15px;
+  padding: 10px;
   background-color: #f5f5f5;
   font-weight: 600;
   color: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 60px;
+  min-width: 45px;
   border-right: 1px solid #e8e8e8;
   user-select: none;
   font-size: 14px;
@@ -159,7 +161,7 @@ body {
 
 input[type="number"], input[type="text"], input[type="range"] {
   width: 100%;
-  padding: 12px 15px;
+  padding: 12px 10px;
   border: none;
   font-size: 15px;
   transition: var(--transition);
@@ -186,7 +188,7 @@ input::placeholder {
   color: var(--error-color);
   font-size: 12px;
   margin-top: 5px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   padding-left: 20px;
   font-weight: 500;
   display: none;
@@ -210,19 +212,19 @@ input::placeholder {
 .input-note {
   font-size: 12px;
   color: var(--neutral-color);
-  margin-top: 8px;
+  margin-top: 6px;
   line-height: 1.4;
 }
 
 .button-container {
-  margin-top: 25px;
+  margin-top: 20px;
 }
 
 .calculate-button {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 14px 25px;
+  padding: 12px 20px;
   border-radius: var(--border-radius);
   font-size: 16px;
   font-weight: 600;
@@ -256,7 +258,7 @@ input::placeholder {
 
 .error-message {
   color: var(--error-color);
-  margin-top: 20px;
+  margin-top: 15px;
   padding: 10px;
   background-color: rgba(229, 57, 53, 0.1);
   border-radius: var(--border-radius);
@@ -266,80 +268,69 @@ input::placeholder {
 }
 
 /* Modern Slider Styles */
-
-/* Hide original sliders */
 .hidden {
   display: none !important;
 }
 
-/* Result item container */
 .result-item {
-  padding: 1.25rem;
+  padding: 15px;
   background-color: #ffffff;
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1.5rem;
+  margin-bottom: 15px;
   transition: all 0.3s ease;
 }
 
-/* Result label */
 .result-label {
-  font-size: 1rem;
+  font-size: 14px;
   color: #334155;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-/* Value display */
 .tenure-display {
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #052d4a;
-  margin-top: 12px;
+  margin-top: 10px;
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
-/* Animation for value updates */
 .value-updated {
   color: #0284c7;
   transform: scale(1.05);
 }
 
-/* Slider container */
 .slider-container {
-  padding: 12px 0;
-  margin: 12px 0;
+  padding: 10px 0;
+  margin: 10px 0;
 }
 
-/* Slider labels */
 .slider-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  margin-top: 8px;
   color: #64748b;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   padding: 0 2px;
 }
 
-/* noUiSlider base styling */
 .noUi-target {
   height: 8px;
   border-radius: 12px;
   border: none;
   box-shadow: none;
   background-color: #e2e8f0;
-  margin: 12px 0;
+  margin: 10px 0;
 }
 
-/* Connected part of the slider */
 .noUi-connect {
   background: linear-gradient(to right, #0369a1, #0284c7);
   border-radius: 12px;
   transition: background-color 0.3s ease;
 }
 
-/* Handle styling */
 .noUi-horizontal .noUi-handle {
   width: 22px;
   height: 22px;
@@ -353,27 +344,23 @@ input::placeholder {
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Handle hover effects */
 .noUi-horizontal .noUi-handle:hover {
   transform: scale(1.1);
   border-color: #0369a1;
   box-shadow: 0 3px 10px rgba(2, 132, 199, 0.25);
 }
 
-/* Active handle styling */
 .noUi-horizontal .noUi-active {
   transform: scale(1.15);
   border-color: #0369a1;
   box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
 }
 
-/* Remove default handle elements */
 .noUi-handle:before, 
 .noUi-handle:after {
   display: none;
 }
 
-/* Focus ring around handle */
 .handle-focus {
   position: absolute;
   width: 36px;
@@ -391,7 +378,6 @@ input::placeholder {
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* Value bubble */
 .value-bubble {
   position: absolute;
   top: -34px;
@@ -421,14 +407,12 @@ input::placeholder {
   border-color: #052d4a transparent transparent transparent;
 }
 
-/* Show bubble on active state or hover */
 .bubble-active,
 .bubble-hover {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
-/* Animation for slider initialization */
 .slider-initialized .noUi-base {
   animation: slider-fade-in 0.5s ease;
 }
@@ -442,7 +426,6 @@ input::placeholder {
   }
 }
 
-/* Edge indicator styles */
 .at-min, .at-max {
   background-color: #f97316;
   border-color: #ea580c;
@@ -452,42 +435,9 @@ input::placeholder {
   border-color: #f97316;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .result-item {
-      padding: 1rem;
-  }
-  
-  .tenure-display {
-      font-size: 1.75rem;
-  }
-}
-
-/* Touch device optimizations */
-@media (pointer: coarse) {
-  .noUi-horizontal .noUi-handle {
-      width: 28px;
-      height: 28px;
-      top: -11px;
-      right: -14px;
-      border-width: 3px;
-  }
-  
-  .value-bubble {
-      padding: 4px 12px;
-      font-size: 14px;
-      top: -40px;
-  }
-  
-  .handle-focus {
-      width: 44px;
-      height: 44px;
-  }
-}
-
 .result-item {
-  margin-bottom: 20px;
-  padding: 16px;
+  margin-bottom: 15px;
+  padding: 15px;
   background-color: white;
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
@@ -495,28 +445,21 @@ input::placeholder {
 }
 
 .result-item:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: var(--hover-shadow);
 }
 
 .result-item.positive {
-  border-top: 4px solid var(--success-color);
+  border-top: 3px solid var(--success-color);
 }
 
 .result-item.negative {
-  border-top: 4px solid var(--error-color);
-}
-
-.result-label {
-  font-weight: 600;
-  color: var(--primary-color);
-  margin-bottom: 10px;
-  font-size: 14px;
+  border-top: 3px solid var(--error-color);
 }
 
 .result-value {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 16px;
   color: var(--primary-color);
 }
 
@@ -530,25 +473,25 @@ input::placeholder {
 
 .initial-message {
   display: flex;
+  flex-direction: column;
   align-items: center;
   color: #333;
-  padding: 25px;
+  padding: 20px 15px;
   background-color: white;
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
   border-left: none;
-  text-align: left;
+  text-align: center;
   line-height: 1.5;
   font-style: normal;
 }
 
 .initial-message-icon {
-  margin-right: 20px;
-  min-width: 60px;
+  margin-bottom: 15px;
 }
 
 .initial-message-icon img {
-  width: 60px;
+  width: 50px;
   height: auto;
 }
 
@@ -558,7 +501,7 @@ input::placeholder {
 }
 
 .initial-message-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--primary-color);
   margin-bottom: 8px;
@@ -570,58 +513,241 @@ input::placeholder {
 }
 
 .payment-method {
-  font-size: 13px;
-  margin-top: 8px;
+  font-size: 12px;
+  margin-top: 6px;
   color: var(--neutral-color);
   font-style: italic;
 }
 
-.hidden {
-  display: none;
-}
-
 .result-pair {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .result-pair .result-item {
-  flex: 1;
-  min-width: 200px;
+  width: 100%;
 }
 
-@media (max-width: 768px) {
-  .calculator-content {
-      flex-direction: column;
-  }
-  
-  .inputs-section {
-      border-right: none;
-      border-bottom: 1px solid var(--border-color);
-  }
-
-  .result-pair {
-      flex-direction: column;
-      gap: 10px;
-  }
-}
-
-/* Disclaimer */
 .disclaimer {
-  padding: 18px 24px;
+  padding: 15px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   color: #555;
-  line-height: 1.7;
+  line-height: 1.5;
   box-shadow: 0 3px 10px rgba(0,0,0,0.05);
   position: relative;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 15px auto;
   text-align: center;
 }
 
 .disclaimer strong {
   color: #333;
+}
+
+/* Media queries for larger screens */
+@media (min-width: 576px) {
+  .container {
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+  
+  .inputs-section, .results-section {
+    padding: 20px;
+  }
+  
+  .input-icon {
+    padding: 10px 15px;
+    min-width: 50px;
+  }
+  
+  input[type="number"], input[type="text"], input[type="range"] {
+    padding: 12px 15px;
+  }
+  
+  .calculate-button {
+    padding: 12px 25px;
+  }
+  
+  .result-item {
+    padding: 16px;
+  }
+  
+  .initial-message {
+    padding: 20px;
+    text-align: left;
+  }
+  
+  .result-label {
+    font-size: 15px;
+  }
+  
+  .result-value {
+    font-size: 17px;
+  }
+  
+  .tenure-display {
+    font-size: 1.4rem;
+  }
+  
+  .disclaimer {
+    padding: 15px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    margin: 25px auto;
+  }
+  
+  .calculator-content {
+    flex-direction: row;
+  }
+  
+  .inputs-section {
+    flex: 0.8;
+    min-width: 300px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: none;
+  }
+  
+  .results-section {
+    flex: 1.2;
+    min-width: 300px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 25px;
+  }
+  
+  .result-pair {
+    flex-direction: row;
+    gap: 20px;
+  }
+  
+  .result-pair .result-item {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .initial-message {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+    padding: 25px;
+  }
+  
+  .initial-message-icon {
+    margin-right: 20px;
+    margin-bottom: 0;
+    min-width: 60px;
+  }
+  
+  .initial-message-icon img {
+    width: 60px;
+  }
+  
+  .initial-message-title {
+    font-size: 18px;
+  }
+  
+  .result-label {
+    font-size: 16px;
+  }
+  
+  .result-value {
+    font-size: 18px;
+  }
+  
+  .tenure-display {
+    font-size: 1.5rem;
+  }
+  
+  .disclaimer {
+    padding: 18px 24px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    margin: 30px auto;
+  }
+  
+  .inputs-section {
+    padding: 25px;
+  }
+  
+  .results-section {
+    padding: 30px;
+  }
+}
+
+/* Touch device optimizations */
+@media (pointer: coarse) {
+  .noUi-horizontal .noUi-handle {
+    width: 28px;
+    height: 28px;
+    top: -11px;
+    right: -14px;
+    border-width: 3px;
+  }
+  
+  .value-bubble {
+    padding: 4px 12px;
+    font-size: 14px;
+    top: -40px;
+  }
+  
+  .handle-focus {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+  }
+  
+  .calculate-button {
+    padding: 15px 25px;
+    font-size: 16px;
+  }
+  
+  input[type="number"], input[type="text"], input[type="range"] {
+    font-size: 16px; /* Prevents zooming on iOS */
+    padding: 15px;
+  }
+  
+  select {
+    font-size: 16px; /* Prevents zooming on iOS */
+  }
+}
+
+/* Fix for iOS input zooming */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Improved accessibility for keyboard navigation */
+input:focus, button:focus {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 1px;
+}
+
+/* Better dark mode support */
+@media (prefers-color-scheme: dark) {
+  /* Optional: Add dark mode styles here if needed */
+}
+
+/* Fix for notched displays */
+@supports (padding: max(0px)) {
+  .container {
+    padding-left: max(15px, env(safe-area-inset-left));
+    padding-right: max(15px, env(safe-area-inset-right));
+  }
 }
