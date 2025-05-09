@@ -484,7 +484,7 @@ function calculateMonthlyInstallments() {
     
     const rateDisplay = document.querySelectorAll('.payment-method');
     rateDisplay.forEach(element => {
-        element.textContent = `Payment method: ${element.textContent.includes('Cash/CPF') ? 'Cash/CPF' : 'Cash Only'} (Using ${rate * 100}% p.a interest rate)`;
+        element.textContent = `Payment method: ${element.textContent.includes('Cash/CPF') ? 'Cash/CPF' : 'Cash Only'}`;
     });
 }
 
