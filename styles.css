@@ -549,7 +549,7 @@ input::placeholder {
 @media (min-width: 576px) {
   .container {
     margin: 20px auto;
-    padding: 0 20px;
+    padding: 0 10px;
   }
   
   .inputs-section, .results-section {
@@ -599,6 +599,7 @@ input::placeholder {
 @media (min-width: 768px) {
   .container {
     margin: 25px auto;
+    padding: 0 10px;
   }
   
   .calculator-content {
@@ -675,6 +676,7 @@ input::placeholder {
 @media (min-width: 992px) {
   .container {
     margin: 30px auto;
+    padding: 0 10px;
   }
   
   .inputs-section {
