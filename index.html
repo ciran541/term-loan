@@ -19,7 +19,7 @@
                         <label class="input-label" for="averageAge">Average Age of Borrower(s)</label>
                         <div class="input-container">
                             <div class="input-icon">Age</div>
-                            <input type="number" id="averageAge" placeholder="E.g 35" min="21" max="70">
+                            <input type="number" id="averageAge" inputmode="numeric" pattern="[0-9]*" placeholder="E.g 35" min="21" max="70">
                         </div>
                         <div class="field-error" id="averageAgeError"></div>
                         <div class="input-note">* Banks use Income-Weighted-Average-Age instead</div>
@@ -30,7 +30,7 @@
                         <label class="input-label" for="propertyValue">Property Valuation</label>
                         <div class="input-container">
                             <div class="input-icon">SGD</div>
-                            <input type="text" id="propertyValue" class="comma-input" placeholder="E.g 1,000,000">
+                            <input type="text" id="propertyValue" inputmode="numeric" pattern="[0-9]*" class="comma-input" placeholder="E.g 1,000,000">
                         </div>
                         <div class="field-error" id="propertyValueError"></div>
                     </div>
@@ -39,7 +39,7 @@
                         <label class="input-label" for="cpfUsed">CPF Used (Including Accrued Interest)</label>
                         <div class="input-container">
                             <div class="input-icon">SGD</div>
-                            <input type="text" id="cpfUsed" class="comma-input" placeholder="E.g 0">
+                            <input type="text" id="cpfUsed" inputmode="numeric" pattern="[0-9]*" class="comma-input" placeholder="E.g 0">
                         </div>
                         <div class="field-error" id="cpfUsedError"></div>
                     </div>
@@ -48,7 +48,7 @@
                         <label class="input-label" for="yearsSincePurchase">Years Since Property Purchase</label>
                         <div class="input-container">
                             <div class="input-icon">Years</div>
-                            <input type="number" id="yearsSincePurchase" placeholder="E.g 3" min="0" max="50">
+                            <input type="number" id="yearsSincePurchase" inputmode="numeric" pattern="[0-9]*" placeholder="E.g 3" min="0" max="50">
                         </div>
                         <div class="field-error" id="yearsSincePurchaseError"></div>
                     </div>
@@ -58,7 +58,7 @@
                         <label class="input-label" for="outstandingHomeLoan">Outstanding Home Loan (If any)</label>
                         <div class="input-container">
                             <div class="input-icon">SGD</div>
-                            <input type="text" id="outstandingHomeLoan" class="comma-input" placeholder="E.g 0">
+                            <input type="text" id="outstandingHomeLoan" inputmode="numeric" pattern="[0-9]*" class="comma-input" placeholder="E.g 0">
                         </div>
                         <div class="field-error" id="outstandingHomeLoanError"></div>
                     </div>
@@ -67,7 +67,7 @@
                         <label class="input-label" for="outstandingTermLoan">Outstanding Equity Loan (If any)</label>
                         <div class="input-container">
                             <div class="input-icon">SGD</div>
-                            <input type="text" id="outstandingTermLoan" class="comma-input" placeholder="E.g 0">
+                            <input type="text" id="outstandingTermLoan" inputmode="numeric" pattern="[0-9]*" class="comma-input" placeholder="E.g 0">
                         </div>
                         <div class="field-error" id="outstandingTermLoanError"></div>
                     </div>
