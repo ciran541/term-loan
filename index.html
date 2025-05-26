@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Singapore Mortgage Term Loan Calculator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modal.css"> <!-- Added modal.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css">
 </head>
 <body>
@@ -89,7 +90,7 @@
                         <div class="initial-message-content">
                             <div class="initial-message-title">Singapore Mortgage Equity Loan Calculator</div>
                             <div class="initial-message-description">
-                                Enter your property details and loan information, then click Calculate to see your eligible equity loan amount and monthly installments.
+                                Enter your property details and loan information, then click Calculate to see your eligible equity loan amount and monthly instalments.
                             </div>
                         </div>
                     </div>
@@ -177,13 +178,69 @@
                                 <strong>Disclaimer from TLC:</strong> Figures provided on this page are for illustration purposes and do not constitute as a formal approval from a bank.
                             </div>
                         </div>
+                         <!-- Added "Send me this report" button -->
+                    <div class="bottom-ipa-section">
+                        <div class="ipa-button-wrapper" style="max-width: 300px; margin: 2rem auto;">
+                            <button class="ipa-button" id="termLoanIpaButton">Send me this report</button>
+                        </div>
                     </div>
+                    </div>
+                    
+                   
                 </section>
-                
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Added IPA Form Modal -->
+    <div id="ipaModal" class="ipa-modal">
+        <div class="ipa-modal-content">
+            <span class="ipa-close">×</span>
+            <div class="ipa-header">Get Your Term Loan Report</div>
+            <p class="ipa-subtitle">Receive a detailed report of your equity loan eligibility!</p>
+            <p class="ipa-subtitle">Let us help you understand your options - it's free and easy</p>
+            
+            <form id="ipaForm" class="ipa-form">
+                <div class="ipa-input-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter Your Name" required>
+                    <span class="ipa-error" id="nameError"></span>
+                </div>
+                <div class="ipa-input-group">
+                    <label for="emailAddress">Email Address</label>
+                    <input type="email" id="emailAddress" name="emailAddress" placeholder="Enter Email Address" required>
+                    <span class="ipa-error" id="emailError"></span>
+                </div>
+                <div class="ipa-input-group">
+                    <label for="mobileNumber">Mobile Number</label>
+                    <input type="tel" id="mobileNumber" name="mobileNumber" placeholder="Enter Mobile Number" required>
+                    <span class="ipa-error" id="mobileError"></span>
+                </div>
+                <button type="submit" class="ipa-submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Added Toast Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <div class="notification-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
+                </svg>
+            </div>
+            <div class="notification-message">
+                <div class="notification-title">Success!</div>
+                <div class="notification-description">Thank you! Your report is being processed and will arrive in your email shortly.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> <!-- Added for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- Added for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+    <script src="script.js"></script>
+    <script src="modal.js"></script> <!-- Added modal.js -->
 </body>
 </html>
